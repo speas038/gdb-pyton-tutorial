@@ -3,10 +3,14 @@
 
 
 class PrintGList( gdb.Command ):
-    """print Glib Glist: wsd_print_glist list objecttpe
+    """
+    
+    Glib Glist: wsd_print_glist list objecttpe
 
-Iterate through the list if nodes in a Glist and display
-a human-readable form of the objects."""
+    Iterate through the list if nodes in a Glist and display
+    a human-readable form of the objects.
+    
+    """
 
     def __init__( self ):
         
@@ -18,7 +22,31 @@ a human-readable form of the objects."""
         arg_list = gdb.string_to_argv( arg )
 
         if len( arg_list ) < 2:
-            print "Usage: wzd_print_glist list objectype"
+            print( "Usage: wzd_print_glist list objectype" )
             return
 
-        gdb.parse_and_eval( arg_list[0] )
+        l = gdb.parse_and_eval( arg_list[0] )
+
+        if l.type.code != gdb.lookup_type('GList').pointer().code:
+            print( "%s is not a Glist*" % arg_list[0] )
+            return
+
+        try:
+            t = gdb.lookup_type( arg_list[1] )
+        except RuntimeError:
+            print( "type %s not found" % arg_list[1] )
+        
+        # iterate list and print value
+        while l:
+            self._print_node(l, t)
+            l = l['next']
+
+    def _print_node( self, node, typeobject ):
+        
+        print( "Node at %s (prev: %s, next %s)" % (node, node['prev'], node['next'],) )
+        data = node['data']
+        pdata = data.cast( typeobject.pointer() )
+        data = pdata.dereference()
+        print( data )
+
+PrintGList()
