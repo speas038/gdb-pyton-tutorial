@@ -1,3 +1,0 @@
-
-all:
-	gcc -ggdb gdb-test.c -o gdb-test
