@@ -47,6 +47,6 @@ class PrintGList( gdb.Command ):
         data = node['data']
         pdata = data.cast( typeobject.pointer() )
         data = pdata.dereference()
-        print( data )
+        print( "Value: ", data )
 
 PrintGList()
